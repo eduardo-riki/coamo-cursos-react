@@ -3,16 +3,16 @@ import {
   Divider,
   Drawer,
   List,
-  ListItem,
   ListItemButton,
   ListItemIcon,
   ListItemText,
   useTheme,
   useMediaQuery,
+  Icon,
 } from "@mui/material";
-import HomeIcon from "@mui/icons-material/Home";
 import { Box } from "@mui/system";
 import { useAppDrawerContext } from "../../contexts";
+import { useMatch, useNavigate, useResolvedPath } from "react-router-dom";
 
 interface IMenuLateralProps {
   children: React.ReactNode;
@@ -20,9 +20,9 @@ interface IMenuLateralProps {
 
 interface IListItemLinkProps {
   to: string;
-  icon: string;
+  icon: React.ReactNode;
   label: string;
-  onClick: () => void;
+  onClick: () => void | undefined;
 }
 
 const ListItemLink: React.FC<IListItemLinkProps> = ({
@@ -31,13 +31,30 @@ const ListItemLink: React.FC<IListItemLinkProps> = ({
   label,
   onClick,
 }) => {
-  return <ListItem></ListItem>;
+  const navigate = useNavigate();
+
+  const resolvePath = useResolvedPath(to);
+  const match = useMatch({ path: resolvePath.pathname, end: false });
+
+  const handleClick = () => {
+    navigate(to);
+    onClick?.();
+  };
+  return (
+    <ListItemButton onClick={handleClick} selected={!!match}>
+      <ListItemIcon>
+        <Icon>{icon}</Icon>
+      </ListItemIcon>
+      <ListItemText primary={label} />
+    </ListItemButton>
+  );
 };
 
 export const MenuLateral: React.FC<IMenuLateralProps> = ({ children }) => {
   const theme = useTheme();
   const smDown = useMediaQuery(theme.breakpoints.up("sm"));
-  const { isDrawerOpen, toggleDrawerOpen } = useAppDrawerContext();
+  const { isDrawerOpen, toggleDrawerOpen, drawerOptions } =
+    useAppDrawerContext();
 
   return (
     <>
@@ -63,25 +80,24 @@ export const MenuLateral: React.FC<IMenuLateralProps> = ({ children }) => {
               alt="Foto de Perfil"
               sx={{ width: theme.spacing(12), height: theme.spacing(12) }}
             >
-              E
+              ER
             </Avatar>
           </Box>
 
           <Divider />
 
           <Box flex={1}>
-            <nav aria-label="nav">
-              <List>
-                <ListItem disablePadding>
-                  <ListItemButton href="/pagina-inicial">
-                    <ListItemIcon>
-                      <HomeIcon />
-                    </ListItemIcon>
-                    <ListItemText primary="Página Inicial" />
-                  </ListItemButton>
-                </ListItem>
-              </List>
-            </nav>
+            <List component="nav">
+              {drawerOptions.map((drawerOption) => (
+                <ListItemLink
+                  key={drawerOption.path}
+                  icon={drawerOption.icon}
+                  label={drawerOption.label}
+                  to={drawerOption.path}
+                  onClick={toggleDrawerOpen}
+                />
+              ))}
+            </List>
           </Box>
         </Box>
       </Drawer>
