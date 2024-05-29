@@ -33,7 +33,7 @@ export const LayoutBaseDePagina: React.FC<ILayoutBaseDePaginaProps> = ({
         display="flex"
         alignItems="center"
       >
-        {smDown && (
+        {!smDown && (
           <IconButton onClick={toggleDrawerOpen}>
             <Icon>menu</Icon>
           </IconButton>

@@ -11,7 +11,7 @@ import {
   Icon,
 } from "@mui/material";
 import { Box } from "@mui/system";
-import { useAppDrawerContext } from "../../contexts";
+import { useAppDrawerContext, useAppThemeContext } from "../../contexts";
 import { useMatch, useNavigate, useResolvedPath } from "react-router-dom";
 
 interface IMenuLateralProps {
@@ -55,6 +55,7 @@ export const MenuLateral: React.FC<IMenuLateralProps> = ({ children }) => {
   const smDown = useMediaQuery(theme.breakpoints.up("sm"));
   const { isDrawerOpen, toggleDrawerOpen, drawerOptions } =
     useAppDrawerContext();
+    const { toggleTheme } = useAppThemeContext();
 
   return (
     <>
@@ -86,7 +87,12 @@ export const MenuLateral: React.FC<IMenuLateralProps> = ({ children }) => {
 
           <Divider />
 
-          <Box flex={1}>
+          <Box
+            flex={1}
+            display="flex"
+            flexDirection="column"
+            justifyContent="space-between"
+          >
             <List component="nav">
               {drawerOptions.map((drawerOption) => (
                 <ListItemLink
@@ -97,6 +103,14 @@ export const MenuLateral: React.FC<IMenuLateralProps> = ({ children }) => {
                   onClick={toggleDrawerOpen}
                 />
               ))}
+            </List>
+            <List component="nav">
+              <ListItemButton onClick={toggleTheme}>
+                <ListItemIcon>
+                  <Icon>contrast</Icon>
+                </ListItemIcon>
+                <ListItemText primary="Alterar tema" />
+              </ListItemButton>
             </List>
           </Box>
         </Box>
