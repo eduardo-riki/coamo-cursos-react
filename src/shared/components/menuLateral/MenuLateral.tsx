@@ -9,8 +9,8 @@ import {
   useTheme,
   useMediaQuery,
   Icon,
+  Box,
 } from "@mui/material";
-import { Box } from "@mui/system";
 import { useAppDrawerContext, useAppThemeContext } from "../../contexts";
 import { useMatch, useNavigate, useResolvedPath } from "react-router-dom";
 
@@ -55,7 +55,7 @@ export const MenuLateral: React.FC<IMenuLateralProps> = ({ children }) => {
   const smDown = useMediaQuery(theme.breakpoints.up("sm"));
   const { isDrawerOpen, toggleDrawerOpen, drawerOptions } =
     useAppDrawerContext();
-    const { toggleTheme } = useAppThemeContext();
+  const { toggleTheme } = useAppThemeContext();
 
   return (
     <>
