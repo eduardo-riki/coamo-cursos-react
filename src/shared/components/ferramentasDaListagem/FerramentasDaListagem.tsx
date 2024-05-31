@@ -35,12 +35,17 @@ export const FerramentasDaListagem: React.FC<IFerramentasDaListagemProps> = ({
           placeholder="Pesquisar..."
           value={textoDaBusca}
           onChange={(e) => aoMudarTextoDaBusca?.(e.target.value)}
+          fullWidth
         />
       )}
 
       <Box flex={1} display="flex" justifyContent="end">
         {mostrarBotaoNovo && (
-          <Button variant="contained" endIcon={<Icon>add</Icon>} onClick={aoClicarEmNovo}>
+          <Button
+            variant="contained"
+            endIcon={<Icon>add</Icon>}
+            onClick={aoClicarEmNovo}
+          >
             {textoDoBotaoNovo}
           </Button>
         )}
