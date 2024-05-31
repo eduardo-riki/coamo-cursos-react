@@ -52,7 +52,7 @@ const ListItemLink: React.FC<IListItemLinkProps> = ({
 
 export const MenuLateral: React.FC<IMenuLateralProps> = ({ children }) => {
   const theme = useTheme();
-  const smDown = useMediaQuery(theme.breakpoints.up("sm"));
+  const smDown = useMediaQuery(theme.breakpoints.down("sm"));
   const { isDrawerOpen, toggleDrawerOpen, drawerOptions } =
     useAppDrawerContext();
   const { toggleTheme } = useAppThemeContext();
