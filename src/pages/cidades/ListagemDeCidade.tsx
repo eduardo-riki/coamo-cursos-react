@@ -83,7 +83,7 @@ export const ListagemDeCidade: React.FC = () => {
         <FerramentasDaListagem
           mostrarCampoDeBusca
           textoDaBusca={pesquisa}
-          aoClicarEmNovo={() => { navigate("/cidades/novo")}}
+          aoClicarEmNovo={() => { navigate("/cidades/detalhe/3")}}
           aoMudarTextoDaBusca={(texto) =>
             setSearchParams({ pesquisa: texto, pagina: "1" }, { replace: true })
           }
