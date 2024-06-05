@@ -42,7 +42,7 @@ export const ListagemDeCidade: React.FC = () => {
   }, [searchParams]);
 
   const handleEdit = (id: number) => {
-    navigate("/cidades/editar/" + id.toString());
+    navigate("/cidades/detalhe/" + id.toString());
   };
 
   const handleRemove = (id: number) => {
@@ -69,6 +69,7 @@ export const ListagemDeCidade: React.FC = () => {
         if (result instanceof Error) {
           alert(result.message);
         } else {
+          console.log(result);
           setCidades(result.data);
           setTotalCount(Number(result.totalCount));
         }
@@ -83,7 +84,9 @@ export const ListagemDeCidade: React.FC = () => {
         <FerramentasDaListagem
           mostrarCampoDeBusca
           textoDaBusca={pesquisa}
-          aoClicarEmNovo={() => { navigate("/cidades/detalhe/3")}}
+          aoClicarEmNovo={() => {
+            navigate("/cidades/detalhe/cadastrar");
+          }}
           aoMudarTextoDaBusca={(texto) =>
             setSearchParams({ pesquisa: texto, pagina: "1" }, { replace: true })
           }
@@ -129,19 +132,9 @@ export const ListagemDeCidade: React.FC = () => {
           </TableBody>
 
           <TableFooter>
-            {isLoading ? (
+            {totalCount > 0 && totalCount > Environment.LIMITE_DE_LINHAS ? (
               <TableRow>
-                <TableCell colSpan={3}>
-                  <LinearProgress variant="indeterminate" />
-                </TableCell>
-              </TableRow>
-            ) : totalCount === 0 ? (
-              <TableRow>
-                <TableCell colSpan={3}>Nenhum registro encontrado.</TableCell>
-              </TableRow>
-            ) : totalCount > 0 && totalCount > Environment.LIMITE_DE_LINHAS ? (
-              <TableRow>
-                <TableCell colSpan={3} content="center">
+                <TableCell colSpan={3} sx={{ justifyContent: "center" }}>
                   <Pagination
                     shape="rounded"
                     page={pagina}
@@ -154,6 +147,18 @@ export const ListagemDeCidade: React.FC = () => {
                     }}
                   />
                 </TableCell>
+              </TableRow>
+            ) : null}
+
+            {isLoading ? (
+              <TableRow>
+                <TableCell colSpan={3}>
+                  <LinearProgress variant="indeterminate" />
+                </TableCell>
+              </TableRow>
+            ) : totalCount === 0 ? (
+              <TableRow>
+                <TableCell colSpan={3}>Nenhum registro encontrado.</TableCell>
               </TableRow>
             ) : null}
           </TableFooter>
