@@ -13,10 +13,7 @@ import {
 } from "@mui/material";
 import { useAppDrawerContext, useAppThemeContext } from "../../contexts";
 import { useMatch, useNavigate, useResolvedPath } from "react-router-dom";
-
-interface IMenuLateralProps {
-  children: React.ReactNode;
-}
+import { PropsWithChildren } from "react";
 
 interface IListItemLinkProps {
   to: string;
@@ -50,7 +47,7 @@ const ListItemLink: React.FC<IListItemLinkProps> = ({
   );
 };
 
-export const MenuLateral: React.FC<IMenuLateralProps> = ({ children }) => {
+export const MenuLateral: React.FC<PropsWithChildren> = ({ children }) => {
   const theme = useTheme();
   const smDown = useMediaQuery(theme.breakpoints.down("sm"));
   const { isDrawerOpen, toggleDrawerOpen, drawerOptions } =
