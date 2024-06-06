@@ -69,7 +69,6 @@ export const ListagemDeCidade: React.FC = () => {
         if (result instanceof Error) {
           alert(result.message);
         } else {
-          console.log(result);
           setCidades(result.data);
           setTotalCount(Number(result.totalCount));
         }
@@ -79,7 +78,6 @@ export const ListagemDeCidade: React.FC = () => {
 
   return (
     <LayoutBaseDePagina
-      titulo="Lista de Cidades"
       barraDeFerramentas={
         <FerramentasDaListagem
           mostrarCampoDeBusca
