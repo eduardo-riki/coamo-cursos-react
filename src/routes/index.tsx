@@ -11,7 +11,7 @@ export const AppRoutes = () => {
       { icon: "home", path: "/pagina-inicial", label: "Página Inicial" },
       { icon: "location_city", path: "/cidades", label: "Cidades" },
     ]);
-  }, []);
+  }, [setDrawerOptions]);
 
   return (
     <Routes>
