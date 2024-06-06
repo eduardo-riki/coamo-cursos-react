@@ -3,7 +3,7 @@ import { LayoutBaseDePagina } from "../../shared/layouts";
 import { FerramentasDeDetalhe } from "../../shared/components";
 import { useEffect, useState } from "react";
 import { CidadesServices } from "../../shared/services/api/cidades/CidadesService";
-import { Box, Button, LinearProgress, TextField } from "@mui/material";
+import { Box, Grid, LinearProgress, Paper, TextField } from "@mui/material";
 import { useForm } from "react-hook-form";
 
 interface IDetalhesDeCidades {
@@ -19,7 +19,14 @@ export const DetalhesDeCidades = () => {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<IDetalhesDeCidades>();
+    getValues,
+    reset,
+  } = useForm<IDetalhesDeCidades>({
+    defaultValues: {
+      nome: "",
+      estado: "",
+    },
+  });
 
   const [isLoading, setIsLoading] = useState(false);
 
@@ -32,14 +39,35 @@ export const DetalhesDeCidades = () => {
           alert(result.message);
           navigate("/cidades");
         } else {
-          // setNomeCidade(result.nome);
+          reset(result);
         }
       });
     }
-  }, [id, navigate]);
+  }, [id, navigate, reset]);
 
-  const handleSave = () => {
-    console.log("Salvado");
+  const handleSave = (data: IDetalhesDeCidades) => {
+    setIsLoading(true);
+    if (id !== "cadastrar") {
+      CidadesServices.updateById(Number(id), { id: Number(id), ...data }).then((result) => {
+        setIsLoading(false);
+        if (result instanceof Error) {
+          alert(result.message);
+        } else {
+          alert("Registro atualizado com sucesso!");
+          navigate("/cidades/detalhe/" + id);
+        }
+      });
+    } else {
+      CidadesServices.create(data).then((result) => {
+        setIsLoading(false);
+        if (result instanceof Error) {
+          alert(result.message);
+        } else {
+          alert("Registro cadastrado com sucesso!");
+          navigate("/cidades/detalhe/" + result);
+        }
+      });
+    }
   };
 
   const handleDelete = (id: number) => {
@@ -55,58 +83,67 @@ export const DetalhesDeCidades = () => {
     }
   };
 
-  const onSubmit = (data: IDetalhesDeCidades) => console.log(data);
+  const onSubmit = (data: IDetalhesDeCidades) => handleSave(data);
 
   return (
     <div>
       <LayoutBaseDePagina
-        titulo={id === "cadastrar" ? "Cadastrar nova cidade" : "nomeCidade"}
+        titulo={id === "cadastrar" ? "Cadastrar nova cidade" : getValues("nome")}
         barraDeFerramentas={
           <FerramentasDeDetalhe
             mostrarBotaoSalvarEVoltar
             mostrarBotaoNovo={id !== "cadastrar"}
             mostrarBotaoApagar={id !== "cadastrar"}
-            aoSalvar={() => handleSave}
-            aoSalvarEVoltar={() => handleSave}
+            aoSalvar={handleSubmit(onSubmit)}
+            aoSalvarEVoltar={handleSubmit(onSubmit)}
             aoApagar={() => handleDelete(Number(id))}
             aoCriarNovo={() => navigate("/cidades/detalhe/cadastrar")}
             aoVoltar={() => navigate("/cidades")}
           />
         }
       >
-        {isLoading ? (
-          <LinearProgress variant="indeterminate" />
-        ) : (
-          <form onSubmit={handleSubmit(onSubmit)}>
-            <Box display="flex" margin={1}>
-              <TextField
-                size="small"
-                error={Boolean(errors?.nome)}
-                helperText={
-                  errors?.nome?.type === "required" && "Name is required."
-                }
-                type="text"
-                placeholder="Nome da cidade"
-                {...register("nome", { required: true })}
-              />
-              <TextField
-                size="small"
-                error={Boolean(errors?.estado)}
-                helperText={
-                  errors?.estado?.type === "required" &&
-                  "State name is required."
-                }
-                type="text"
-                placeholder="Nome do Estado"
-                {...register("estado", { required: true })}
-              />
-              <Button type="submit" variant="contained">
-                Submit
-              </Button>
-            </Box>
-          </form>
-        )}
+        <form onSubmit={handleSubmit(onSubmit)}>
+          <Box margin={1} display="flex" flexDirection="column" component={Paper} variant="outlined">
+            {isLoading ? (
+              <LinearProgress variant="indeterminate" />
+            ) : (
+              <Grid container direction="column" padding={2} spacing={2}>
+                <Grid container item direction="row" spacing={2}>
+                  <Grid item xs={12} sm={12} md={6} lg={4} xl={2}>
+                    <TextField
+                      size="small"
+                      fullWidth
+                      error={Boolean(errors?.nome)}
+                      helperText={
+                        errors?.nome?.type === "required" && "Nome da cidade é obrigatório."
+                      }
+                      type="text"
+                      label="Nome da cidade"
+                      {...register("nome", { required: true })}
+                    />
+                  </Grid>
+                </Grid>
+                <Grid container item direction="row" spacing={2}>
+                  <Grid item xs={12} sm={12} md={6} lg={4} xl={2}>
+                    <TextField
+                      size="small"
+                      fullWidth
+                      error={Boolean(errors?.estado)}
+                      helperText={
+                        errors?.estado?.type === "required" &&
+                        "Nome do Estado é obrigatório."
+                      }
+                      type="text"
+                      label="Nome do Estado"
+                      {...register("estado", { required: true })}
+                    />
+                  </Grid>
+                </Grid>
+              </Grid>
+            )}
+          </Box>
+        </form>
       </LayoutBaseDePagina>
-    </div>
+    </div >
   );
 };
