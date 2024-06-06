@@ -1,10 +1,19 @@
 import { useNavigate, useParams } from "react-router-dom";
 import { LayoutBaseDePagina } from "../../shared/layouts";
 import { FerramentasDeDetalhe } from "../../shared/components";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { CidadesServices } from "../../shared/services/api/cidades/CidadesService";
-import { Box, Grid, LinearProgress, Paper, TextField } from "@mui/material";
+import {
+  Box,
+  Grid,
+  LinearProgress,
+  Paper,
+  Typography,
+} from "@mui/material";
 import { useForm } from "react-hook-form";
+import { CidadeValidationSchema } from "../../shared/validations";
+import { yupResolver } from "@hookform/resolvers/yup";
+import { VTextField } from "../../shared/forms/VTextField";
 
 interface IDetalhesDeCidades {
   nome: string;
@@ -18,48 +27,43 @@ export const DetalhesDeCidades = () => {
   const {
     register,
     handleSubmit,
-    formState: { errors },
-    getValues,
     reset,
+    formState: { isSubmitting, isLoading, errors },
   } = useForm<IDetalhesDeCidades>({
     defaultValues: {
       nome: "",
       estado: "",
     },
+    resolver: yupResolver(CidadeValidationSchema),
   });
-
-  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     if (id !== "cadastrar") {
-      setIsLoading(true);
       CidadesServices.getById(Number(id)).then((result) => {
-        setIsLoading(false);
         if (result instanceof Error) {
           alert(result.message);
-          navigate("/cidades");
+          // navigate("/cidades");
         } else {
           reset(result);
         }
       });
     }
-  }, [id, navigate, reset]);
+  }, [id, reset]);
 
   const handleSave = (data: IDetalhesDeCidades) => {
-    setIsLoading(true);
     if (id !== "cadastrar") {
-      CidadesServices.updateById(Number(id), { id: Number(id), ...data }).then((result) => {
-        setIsLoading(false);
-        if (result instanceof Error) {
-          alert(result.message);
-        } else {
-          alert("Registro atualizado com sucesso!");
-          navigate("/cidades/detalhe/" + id);
+      CidadesServices.updateById(Number(id), { id: Number(id), ...data }).then(
+        (result) => {
+          if (result instanceof Error) {
+            alert(result.message);
+          } else {
+            alert("Registro atualizado com sucesso!");
+            navigate("/cidades/detalhe/" + id);
+          }
         }
-      });
+      );
     } else {
       CidadesServices.create(data).then((result) => {
-        setIsLoading(false);
         if (result instanceof Error) {
           alert(result.message);
         } else {
@@ -86,64 +90,59 @@ export const DetalhesDeCidades = () => {
   const onSubmit = (data: IDetalhesDeCidades) => handleSave(data);
 
   return (
-    <div>
-      <LayoutBaseDePagina
-        titulo={id === "cadastrar" ? "Cadastrar nova cidade" : getValues("nome")}
-        barraDeFerramentas={
-          <FerramentasDeDetalhe
-            mostrarBotaoSalvarEVoltar
-            mostrarBotaoNovo={id !== "cadastrar"}
-            mostrarBotaoApagar={id !== "cadastrar"}
-            aoSalvar={handleSubmit(onSubmit)}
-            aoSalvarEVoltar={handleSubmit(onSubmit)}
-            aoApagar={() => handleDelete(Number(id))}
-            aoCriarNovo={() => navigate("/cidades/detalhe/cadastrar")}
-            aoVoltar={() => navigate("/cidades")}
-          />
-        }
-      >
-        <form onSubmit={handleSubmit(onSubmit)}>
-          <Box margin={1} display="flex" flexDirection="column" component={Paper} variant="outlined">
-            {isLoading ? (
-              <LinearProgress variant="indeterminate" />
-            ) : (
-              <Grid container direction="column" padding={2} spacing={2}>
-                <Grid container item direction="row" spacing={2}>
-                  <Grid item xs={12} sm={12} md={6} lg={4} xl={2}>
-                    <TextField
-                      size="small"
-                      fullWidth
-                      error={Boolean(errors?.nome)}
-                      helperText={
-                        errors?.nome?.type === "required" && "Nome da cidade é obrigatório."
-                      }
-                      type="text"
-                      label="Nome da cidade"
-                      {...register("nome", { required: true })}
-                    />
-                  </Grid>
-                </Grid>
-                <Grid container item direction="row" spacing={2}>
-                  <Grid item xs={12} sm={12} md={6} lg={4} xl={2}>
-                    <TextField
-                      size="small"
-                      fullWidth
-                      error={Boolean(errors?.estado)}
-                      helperText={
-                        errors?.estado?.type === "required" &&
-                        "Nome do Estado é obrigatório."
-                      }
-                      type="text"
-                      label="Nome do Estado"
-                      {...register("estado", { required: true })}
-                    />
-                  </Grid>
+    <LayoutBaseDePagina
+      barraDeFerramentas={
+        <FerramentasDeDetalhe
+          mostrarBotaoSalvarEVoltar
+          mostrarBotaoNovo={id !== "cadastrar"}
+          mostrarBotaoApagar={id !== "cadastrar"}
+          aoSalvar={handleSubmit(onSubmit)}
+          aoSalvarEVoltar={handleSubmit(onSubmit)}
+          aoApagar={() => handleDelete(Number(id))}
+          aoCriarNovo={() => navigate("/cidades/detalhe/cadastrar")}
+          aoVoltar={() => navigate("/cidades")}
+        />
+      }
+    >
+      <form onSubmit={handleSubmit(onSubmit)}>
+        <Box margin={1} display="flex" flexDirection="column" component={Paper}>
+          {(isLoading || isSubmitting) ? (
+            <LinearProgress variant="indeterminate" />
+          ) : (
+            <Grid container direction="column" padding={2} spacing={2}>
+              <Grid item>
+                <Typography variant="h6">
+                  {id === "cadastrar"
+                    ? "Cadastrar nova cidade"
+                    : "Editar cidade"}
+                </Typography>
+              </Grid>
+              <Grid container item direction="row" spacing={2}>
+                <Grid item xs={12} sm={12} md={6} lg={4} xl={2}>
+                  <VTextField
+                    label={id !== "cadastrar" ? "" : "Nome da cidade"}
+                    name="nome"
+                    type="text"
+                    register={register}
+                    error={errors.nome?.message}
+                  />
                 </Grid>
               </Grid>
-            )}
-          </Box>
-        </form>
-      </LayoutBaseDePagina>
-    </div >
+              <Grid container item direction="row" spacing={2}>
+                <Grid item xs={12} sm={12} md={6} lg={4} xl={2}>
+                  <VTextField
+                    label={id !== "cadastrar" ? "" : "Nome do Estado"}
+                    name="estado"
+                    type="text"
+                    register={register}
+                    error={errors.estado?.message}
+                  />
+                </Grid>
+              </Grid>
+            </Grid>
+          )}
+        </Box>
+      </form>
+    </LayoutBaseDePagina>
   );
 };
