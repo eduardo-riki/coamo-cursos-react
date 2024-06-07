@@ -4,7 +4,7 @@ import { LayoutBaseDePagina } from "../../shared/layouts";
 import {
   CidadesServices,
   IListagemCidade,
-} from "../../shared/services/api/cidades/CidadesService";
+} from "../../shared/services/api/cidades/CidadesServices";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { UseDebounce } from "../../shared/hooks/UseDebounce";
 import {

@@ -1,21 +1,15 @@
 import { useNavigate, useParams } from "react-router-dom";
+import { Box, Grid, LinearProgress, Paper, Typography } from "@mui/material";
+import { Controller, useForm } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
+
+import { CidadesServices } from "../../shared/services/api";
 import { LayoutBaseDePagina } from "../../shared/layouts";
 import { FerramentasDeDetalhe } from "../../shared/components";
-import { useEffect } from "react";
-import { CidadesServices } from "../../shared/services/api/cidades/CidadesService";
-import {
-  Box,
-  Grid,
-  LinearProgress,
-  Paper,
-  Typography,
-} from "@mui/material";
-import { useForm } from "react-hook-form";
 import { CidadeValidationSchema } from "../../shared/validations";
-import { yupResolver } from "@hookform/resolvers/yup";
 import { VTextField } from "../../shared/forms/VTextField";
 
-interface IDetalhesDeCidades {
+type TDetalhesDeCidades = {
   nome: string;
   estado: string;
 }
@@ -25,32 +19,30 @@ export const DetalhesDeCidades = () => {
   const navigate = useNavigate();
 
   const {
-    register,
+    control,
+    formState: { errors, isLoading, isSubmitting },
     handleSubmit,
-    reset,
-    formState: { isSubmitting, isLoading, errors },
-  } = useForm<IDetalhesDeCidades>({
-    defaultValues: {
-      nome: "",
-      estado: "",
-    },
-    resolver: yupResolver(CidadeValidationSchema),
-  });
-
-  useEffect(() => {
-    if (id !== "cadastrar") {
-      CidadesServices.getById(Number(id)).then((result) => {
+    register,
+  } = useForm<TDetalhesDeCidades>({
+    defaultValues: async () => {
+      if (id !== "cadastrar") {
+        const result = await CidadesServices.getById(Number(id));
         if (result instanceof Error) {
           alert(result.message);
-          // navigate("/cidades");
+          navigate("/cidades");
         } else {
-          reset(result);
+          return result;
         }
-      });
-    }
-  }, [id, reset]);
+      }
+      return { nome: "", estado: "" };
+    },
+    resolver: yupResolver(CidadeValidationSchema),
+    mode: "onChange",
+  });
 
-  const handleSave = (data: IDetalhesDeCidades) => {
+  const onSubmit = (data: TDetalhesDeCidades) => handleSave(data);
+
+  const handleSave = (data: TDetalhesDeCidades) => {
     if (id !== "cadastrar") {
       CidadesServices.updateById(Number(id), { id: Number(id), ...data }).then(
         (result) => {
@@ -61,18 +53,18 @@ export const DetalhesDeCidades = () => {
             navigate("/cidades/detalhe/" + id);
           }
         }
-      );
-    } else {
-      CidadesServices.create(data).then((result) => {
-        if (result instanceof Error) {
-          alert(result.message);
-        } else {
-          alert("Registro cadastrado com sucesso!");
-          navigate("/cidades/detalhe/" + result);
-        }
-      });
+      ); return true;
     }
-  };
+
+    CidadesServices.create(data).then((result) => {
+      if (result instanceof Error) {
+        alert(result.message);
+      } else {
+        alert("Registro cadastrado com sucesso!");
+        navigate("/cidades/detalhe/" + result);
+      } return true;
+    });
+  }
 
   const handleDelete = (id: number) => {
     if (window.confirm("Deseja realmente remover este registro?")) {
@@ -86,8 +78,6 @@ export const DetalhesDeCidades = () => {
       });
     }
   };
-
-  const onSubmit = (data: IDetalhesDeCidades) => handleSave(data);
 
   return (
     <LayoutBaseDePagina
@@ -104,45 +94,59 @@ export const DetalhesDeCidades = () => {
         />
       }
     >
-      <form onSubmit={handleSubmit(onSubmit)}>
-        <Box margin={1} display="flex" flexDirection="column" component={Paper}>
-          {(isLoading || isSubmitting) ? (
-            <LinearProgress variant="indeterminate" />
-          ) : (
-            <Grid container direction="column" padding={2} spacing={2}>
-              <Grid item>
-                <Typography variant="h6">
-                  {id === "cadastrar"
-                    ? "Cadastrar nova cidade"
-                    : "Editar cidade"}
-                </Typography>
-              </Grid>
-              <Grid container item direction="row" spacing={2}>
-                <Grid item xs={12} sm={12} md={6} lg={4} xl={2}>
-                  <VTextField
-                    label={id !== "cadastrar" ? "" : "Nome da cidade"}
-                    name="nome"
-                    type="text"
-                    register={register}
-                    error={errors.nome?.message}
-                  />
-                </Grid>
-              </Grid>
-              <Grid container item direction="row" spacing={2}>
-                <Grid item xs={12} sm={12} md={6} lg={4} xl={2}>
-                  <VTextField
-                    label={id !== "cadastrar" ? "" : "Nome do Estado"}
-                    name="estado"
-                    type="text"
-                    register={register}
-                    error={errors.estado?.message}
-                  />
-                </Grid>
+      <Box
+        component={Paper}
+        onSubmit={handleSubmit(onSubmit)}
+        margin={1}
+      >
+        {(isLoading || isSubmitting) ? (
+          <LinearProgress variant="indeterminate" />
+        ) : (
+          <Grid container direction="column" padding={2} spacing={2}>
+            <Grid item>
+              <Typography variant="h6">
+                {id === "cadastrar"
+                  ? "Cadastrar nova cidade"
+                  : "Editar cidade"}
+              </Typography>
+            </Grid>
+            <Grid container item direction="row" spacing={2}>
+              <Grid item xs={12} sm={12} md={6} lg={4} xl={2}>
+                <Controller
+                  name="nome"
+                  control={control}
+                  render={({ field }) => (
+                    <VTextField
+                      name="nome"
+                      label={id !== "cadastrar" ? "" : "Nome da cidade"}
+                      type="text"
+                      register={register}
+                      error={errors.nome?.message}
+                    />
+                  )}
+                />
               </Grid>
             </Grid>
-          )}
-        </Box>
-      </form>
+            <Grid container item direction="row" spacing={2}>
+              <Grid item xs={12} sm={12} md={6} lg={4} xl={2}>
+                <Controller
+                  name="estado"
+                  control={control}
+                  render={({ field }) => (
+                    <VTextField
+                      name={field.name}
+                      label={id !== "cadastrar" ? "" : "Nome do Estado"}
+                      type="text"
+                      register={register}
+                      error={errors.estado?.message}
+                    />
+                  )}
+                />
+              </Grid>
+            </Grid>
+          </Grid>
+        )}
+      </Box>
     </LayoutBaseDePagina>
   );
 };
