@@ -10,6 +10,7 @@ export const VTextField = ({ label, name, type, register, error }: {
 }) => {
   return (
     <TextField
+      variant="outlined"
       size="small"
       fullWidth
       required
