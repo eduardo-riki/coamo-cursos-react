@@ -14,6 +14,7 @@ import {
 import { useAppDrawerContext, useAppThemeContext } from "../../contexts";
 import { useMatch, useNavigate, useResolvedPath } from "react-router-dom";
 import { PropsWithChildren } from "react";
+import { useAuthContext } from "../../contexts/AuthContext";
 
 interface IListItemLinkProps {
   to: string;
@@ -52,7 +53,8 @@ export const MenuLateral: React.FC<PropsWithChildren> = ({ children }) => {
   const smDown = useMediaQuery(theme.breakpoints.down("sm"));
   const { isDrawerOpen, toggleDrawerOpen, drawerOptions } =
     useAppDrawerContext();
-  const { toggleTheme } = useAppThemeContext();
+  const { toggleTheme,  } = useAppThemeContext();
+  const { logout } = useAuthContext();
 
   return (
     <>
@@ -107,6 +109,12 @@ export const MenuLateral: React.FC<PropsWithChildren> = ({ children }) => {
                   <Icon>contrast</Icon>
                 </ListItemIcon>
                 <ListItemText primary="Alterar tema" />
+              </ListItemButton>
+              <ListItemButton onClick={logout}>
+                <ListItemIcon>
+                  <Icon>logout</Icon>
+                </ListItemIcon>
+                <ListItemText primary="Log Out" />
               </ListItemButton>
             </List>
           </Box>
