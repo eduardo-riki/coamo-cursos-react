@@ -1,9 +1,9 @@
 import { TextField } from "@mui/material";
 import { UseFormRegister } from "react-hook-form";
 
-import { TDetalhesDeCidades, TDetalhesDePessoas } from "../../pages";
+import { TDetalhesDeCidades, TDetalhesDePessoas, TDetalhesDeUsuarios } from "../../pages";
 
-type TDetalhesDeCidadesEPessoas = TDetalhesDeCidades & TDetalhesDePessoas;
+type TDetalhesDeCidadesEPessoas = TDetalhesDeCidades & TDetalhesDePessoas & TDetalhesDeUsuarios;
 
 export const VTextField = ({
   name,
