@@ -22,7 +22,6 @@ export const DetalhesDePessoas = () => {
   const navigate = useNavigate();
 
   const {
-    control,
     formState: { errors, isLoading },
     handleSubmit,
     register,
@@ -81,7 +80,7 @@ export const DetalhesDePessoas = () => {
           alert(result.message);
         } else {
           alert("Registro apagado com sucesso!");
-          navigate("/cidades");
+          navigate("/pessoas");
         }
       });
     }
@@ -137,6 +136,17 @@ export const DetalhesDePessoas = () => {
                   type="text"
                   register={register}
                   error={errors.email?.message}
+                />
+              </Grid>
+            </Grid>
+            <Grid container item direction="row" spacing={2}>
+              <Grid item xs={12} sm={12} md={6} lg={4} xl={2}>
+                <VTextField
+                  name="cidadeId"
+                  label="Cidade"
+                  type="text"
+                  register={register}
+                  error={errors.cidadeId?.message}
                 />
               </Grid>
             </Grid>
