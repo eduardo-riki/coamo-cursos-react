@@ -43,7 +43,6 @@ export const DetalhesDePessoas = () => {
   });
 
   const onSubmit = (data: TDetalhesDePessoas) => {
-    console.log(isCadastro);
     if (isCadastro) {
       handleSave(data);
     } else {
