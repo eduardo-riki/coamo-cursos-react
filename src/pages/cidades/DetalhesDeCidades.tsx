@@ -32,7 +32,7 @@ export const DetalhesDeCidades = () => {
     handleSubmit,
     register,
     reset,
-  } = useForm({
+  } = useForm<TDetalhesDeCidades>({
     defaultValues: async () => {
       if (!isCadastro) {
         const result = await CidadesServices.getById(Number(id));
@@ -127,7 +127,6 @@ export const DetalhesDeCidades = () => {
               <Grid item xs={12} sm={12} md={6} lg={4} xl={2}>
                 <VTextField
                   name="nome"
-                  control={control}
                   label="Nome da Cidade"
                   type="text"
                   register={register}
@@ -139,7 +138,6 @@ export const DetalhesDeCidades = () => {
               <Grid item xs={12} sm={12} md={6} lg={4} xl={2}>
                 <VTextField
                   name="estado"
-                  control={control}
                   label="Nome do Estado"
                   type="text"
                   register={register}
