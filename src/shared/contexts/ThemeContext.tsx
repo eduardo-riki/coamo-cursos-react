@@ -1,4 +1,5 @@
 import {
+  PropsWithChildren,
   createContext,
   useCallback,
   useContext,
@@ -20,10 +21,7 @@ export const useAppThemeContext = () => {
   return useContext(ThemeContext);
 };
 
-interface IAppThemeProviderProps {
-  children: React.ReactNode;
-}
-export const AppThemeProvider: React.FC<IAppThemeProviderProps> = ({
+export const AppThemeProvider: React.FC<PropsWithChildren> = ({
   children,
 }) => {
   const [themeName, setThemeName] = useState<"light" | "dark">("light");
