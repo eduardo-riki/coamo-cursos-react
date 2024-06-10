@@ -1,5 +1,6 @@
 import { TextField } from "@mui/material";
 import { Control, Controller, UseFormRegister } from "react-hook-form";
+
 import { TDetalhesDeCidades } from "../../pages";
 
 export const VTextField = ({
@@ -10,8 +11,8 @@ export const VTextField = ({
   register,
   error,
 }: {
-  name: string;
-  control: Control<TDetalhesDeCidades, any>;
+  name: keyof TDetalhesDeCidades;
+  control: Control<TDetalhesDeCidades>;
   label: string;
   type: string;
   register: UseFormRegister<any>;
@@ -19,7 +20,7 @@ export const VTextField = ({
 }) => {
   return (
     <Controller
-      name={name as "nome" | "estado"}
+      name={name}
       control={control}
       render={({ field }) => (
         <TextField
