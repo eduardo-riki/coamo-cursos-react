@@ -1,8 +1,19 @@
+import {
+  Box,
+  Grid,
+  LinearProgress,
+  Paper,
+  Typography,
+} from "@mui/material";
 import { useNavigate, useParams } from "react-router-dom";
+import { useForm } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
 
 import { CidadesServices } from "../../shared/services/api";
-import { useEffect } from "react";
-import { FormularioDeCidade } from "./forms/FormularioDeCidade";
+import { LayoutBaseDePagina } from "../../shared/layouts";
+import { FerramentasDeDetalhe } from "../../shared/components";
+import { VTextField } from "../../shared/forms/VTextField";
+import { CidadeValidationSchema } from "../../shared/validations";
 
 export type TDetalhesDeCidades = {
   nome: string;
@@ -10,46 +21,62 @@ export type TDetalhesDeCidades = {
 };
 
 export const DetalhesDeCidades = () => {
-  const { id = "cadastrar" } = useParams<"id">();
+  const { id } = useParams<"id">() as { id: string };
+  const isCadastro = id === "cadastrar" ? true : false;
+
   const navigate = useNavigate();
 
-  useEffect(() => {
-    if (id !== "cadastrar") {
-      CidadesServices.getById(Number(id)).then((result) => {
+  const {
+    control,
+    formState: { errors, isLoading },
+    handleSubmit,
+    register,
+    reset,
+  } = useForm({
+    defaultValues: async () => {
+      if (!isCadastro) {
+        const result = await CidadesServices.getById(Number(id));
         if (result instanceof Error) {
           alert(result.message);
-        } else {
-          alert("Registro atualizado com sucesso!");
-          navigate("/cidades/detalhe/" + id);
+          return { nome: "", estado: "" };
         }
-      });
-    }
-  }, [id, navigate]);
-
-  const handleSave = (data: TDetalhesDeCidades) => {
-    if (id !== "cadastrar") {
-      CidadesServices.updateById(Number(id), { id: Number(id), ...data }).then(
-        (result) => {
-          if (result instanceof Error) {
-            alert(result.message);
-          } else {
-            alert("Registro atualizado com sucesso!");
-            navigate("/cidades/detalhe/" + id);
-          }
-        }
-      );
-      return true;
-    }
-
-    CidadesServices.create(data).then((result) => {
-      if (result instanceof Error) {
-        alert(result.message);
-      } else {
-        alert("Registro cadastrado com sucesso!");
-        navigate("/cidades/detalhe/" + result);
+        return result;
       }
-      return true;
+      return { nome: "", estado: "" };
+    },
+    resolver: yupResolver(CidadeValidationSchema),
+    mode: "onChange",
+  });
+
+  const onSubmit = (data: TDetalhesDeCidades) => {
+    console.log(isCadastro);
+    if (isCadastro) {
+      handleSave(data);
+    } else {
+      console.log(data);
+      handleEdit(data);
+    }
+  };
+
+  const handleSave = async (data: TDetalhesDeCidades) => {
+    const result = await CidadesServices.create(data);
+    if (result instanceof Error) {
+      alert(result.message);
+    } else {
+      alert("Registro cadastrado com sucesso!");
+    }
+  };
+
+  const handleEdit = async (data: TDetalhesDeCidades) => {
+    const result = await CidadesServices.updateById(Number(id), {
+      id: Number(id),
+      ...data,
     });
+    if (result instanceof Error) {
+      alert(result.message);
+    } else {
+      alert("Registro atualizado com sucesso!");
+    }
   };
 
   const handleDelete = (id: number) => {
@@ -66,12 +93,63 @@ export const DetalhesDeCidades = () => {
   };
 
   return (
-    <FormularioDeCidade
-      id={id}
-      novaCidade={id === "cadastrar"}
-      cidade={{ nome: "", estado: "" }}
-      handleSave={handleSave}
-      handleDelete={handleDelete}
-    />
+    <LayoutBaseDePagina
+      barraDeFerramentas={
+        <FerramentasDeDetalhe
+          mostrarBotaoSalvarEVoltar
+          mostrarBotaoNovo={!isCadastro}
+          mostrarBotaoApagar={!isCadastro}
+          aoSalvar={handleSubmit(onSubmit)}
+          aoSalvarEVoltar={async () => {
+            await handleSubmit(onSubmit)();
+            navigate("/cidades");
+          }}
+          aoApagar={() => handleDelete(Number(id))}
+          aoCriarNovo={async () => {
+            await reset({ nome: "", estado: "" });
+            navigate("/cidades/detalhe/cadastrar");
+          }}
+          aoVoltar={() => navigate("/cidades")}
+        />
+      }
+    >
+      <Box component={Paper} onSubmit={handleSubmit(onSubmit)} margin={1}>
+        {isLoading ? (
+          <LinearProgress variant="indeterminate" />
+        ) : (
+          <Grid container direction="column" padding={2} spacing={2}>
+            <Grid item>
+              <Typography variant="h6">
+                {isCadastro ? "Cadastrar nova cidade" : "Editar cidade"}
+              </Typography>
+            </Grid>
+            <Grid container item direction="row" spacing={2}>
+              <Grid item xs={12} sm={12} md={6} lg={4} xl={2}>
+                <VTextField
+                  name="nome"
+                  control={control}
+                  label="Nome da Cidade"
+                  type="text"
+                  register={register}
+                  error={errors.nome?.message}
+                />
+              </Grid>
+            </Grid>
+            <Grid container item direction="row" spacing={2}>
+              <Grid item xs={12} sm={12} md={6} lg={4} xl={2}>
+                <VTextField
+                  name="estado"
+                  control={control}
+                  label="Nome do Estado"
+                  type="text"
+                  register={register}
+                  error={errors.estado?.message}
+                />
+              </Grid>
+            </Grid>
+          </Grid>
+        )}
+      </Box>
+    </LayoutBaseDePagina>
   );
 };
