@@ -1,26 +1,21 @@
-import {
-  Box,
-  Grid,
-  LinearProgress,
-  Paper,
-  Typography,
-} from "@mui/material";
+import { Box, Grid, LinearProgress, Paper, Typography } from "@mui/material";
 import { useNavigate, useParams } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 
-import { CidadesServices } from "../../shared/services/api";
+import { PessoasServices } from "../../shared/services/api";
 import { LayoutBaseDePagina } from "../../shared/layouts";
 import { FerramentasDeDetalhe } from "../../shared/components";
 import { VTextField } from "../../shared/forms/VTextField";
-import { CidadeValidationSchema } from "../../shared/validations";
+import { PessoaValidationSchema } from "../../shared/validations";
 
-export type TDetalhesDeCidades = {
-  nome: string;
-  estado: string;
+export type TDetalhesDePessoas = {
+  nomeCompleto: string;
+  email: string;
+  cidadeId: number;
 };
 
-export const DetalhesDeCidades = () => {
+export const DetalhesDePessoas = () => {
   const { id } = useParams<"id">() as { id: string };
   const isCadastro = id === "cadastrar" ? true : false;
 
@@ -32,23 +27,23 @@ export const DetalhesDeCidades = () => {
     handleSubmit,
     register,
     reset,
-  } = useForm<TDetalhesDeCidades>({
+  } = useForm<TDetalhesDePessoas>({
     defaultValues: async () => {
       if (!isCadastro) {
-        const result = await CidadesServices.getById(Number(id));
+        const result = await PessoasServices.getById(Number(id));
         if (result instanceof Error) {
           alert(result.message);
-          return { nome: "", estado: "" };
+          return { nomeCompleto: "", email: "", cidadeId: 0 };
         }
         return result;
       }
-      return { nome: "", estado: "" };
+      return { nomeCompleto: "", email: "", cidadeId: 0 };
     },
-    resolver: yupResolver(CidadeValidationSchema),
+    resolver: yupResolver(PessoaValidationSchema),
     mode: "onChange",
   });
 
-  const onSubmit = (data: TDetalhesDeCidades) => {
+  const onSubmit = (data: TDetalhesDePessoas) => {
     console.log(isCadastro);
     if (isCadastro) {
       handleSave(data);
@@ -58,8 +53,8 @@ export const DetalhesDeCidades = () => {
     }
   };
 
-  const handleSave = async (data: TDetalhesDeCidades) => {
-    const result = await CidadesServices.create(data);
+  const handleSave = async (data: TDetalhesDePessoas) => {
+    const result = await PessoasServices.create(data);
     if (result instanceof Error) {
       alert(result.message);
     } else {
@@ -67,8 +62,8 @@ export const DetalhesDeCidades = () => {
     }
   };
 
-  const handleEdit = async (data: TDetalhesDeCidades) => {
-    const result = await CidadesServices.updateById(Number(id), {
+  const handleEdit = async (data: TDetalhesDePessoas) => {
+    const result = await PessoasServices.updateById(Number(id), {
       id: Number(id),
       ...data,
     });
@@ -81,7 +76,7 @@ export const DetalhesDeCidades = () => {
 
   const handleDelete = (id: number) => {
     if (window.confirm("Deseja realmente remover este registro?")) {
-      CidadesServices.deleteById(id).then((result) => {
+      PessoasServices.deleteById(id).then((result) => {
         if (result instanceof Error) {
           alert(result.message);
         } else {
@@ -106,7 +101,7 @@ export const DetalhesDeCidades = () => {
           }}
           aoApagar={() => handleDelete(Number(id))}
           aoCriarNovo={async () => {
-            await reset({ nome: "", estado: "" });
+            await reset({ nomeCompleto: "", email: "", cidadeId: 0 });
             navigate("/cidades/detalhe/cadastrar");
           }}
           aoVoltar={() => navigate("/cidades")}
@@ -126,22 +121,22 @@ export const DetalhesDeCidades = () => {
             <Grid container item direction="row" spacing={2}>
               <Grid item xs={12} sm={12} md={6} lg={4} xl={2}>
                 <VTextField
-                  name="nome"
-                  label="Nome da Cidade"
+                  name="nomeCompleto"
+                  label="Nome Completo"
                   type="text"
                   register={register}
-                  error={errors.nome?.message}
+                  error={errors.nomeCompleto?.message}
                 />
               </Grid>
             </Grid>
             <Grid container item direction="row" spacing={2}>
               <Grid item xs={12} sm={12} md={6} lg={4} xl={2}>
                 <VTextField
-                  name="estado"
-                  label="Nome do Estado"
+                  name="email"
+                  label="E-mail"
                   type="text"
                   register={register}
-                  error={errors.estado?.message}
+                  error={errors.email?.message}
                 />
               </Grid>
             </Grid>

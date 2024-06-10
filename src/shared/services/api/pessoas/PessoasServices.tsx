@@ -1,20 +1,20 @@
 import { Api } from "../axios-config";
 
-interface IListagemPessoa {
+export interface IListagemPessoa {
   id: number;
-  nome: string;
+  nomeCompleto: string;
   email: string;
   cidadeId: number;
 }
 
-interface IDetalhePessoa {
+export interface IDetalhePessoa {
   id: number;
-  nome: string;
+  nomeCompleto: string;
   email: string;
   cidadeId: number;
 }
 
-interface TPessoasComTotalCount {
+export interface TPessoasComTotalCount {
   data: IListagemPessoa[];
   totalCount: number;
 }
