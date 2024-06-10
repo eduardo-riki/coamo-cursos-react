@@ -1,3 +1,4 @@
+import { Environment } from "../../../environments";
 import { Api } from "../axios-config";
 
 export interface IListagemPessoa {
@@ -41,7 +42,7 @@ const getAll = async (
   filter = ""
 ): Promise<TPessoasComTotalCount | Error> => {
   try {
-    const url = `/pessoa/listar?${page}&${process.env.LIMITE_DE_LINHAS}&filter_like=${filter}`;
+    const url = `/pessoa/listar?page=${page}&limit=${Environment.LIMITE_DE_LINHAS}&filter=${filter}`;
     const { data, headers } = await Api.get(url);
 
     if (data) {

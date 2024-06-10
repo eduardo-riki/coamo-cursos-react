@@ -27,7 +27,6 @@ export const DetalhesDeCidades = () => {
   const navigate = useNavigate();
 
   const {
-    control,
     formState: { errors, isLoading },
     handleSubmit,
     register,
