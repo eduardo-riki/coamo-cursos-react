@@ -2,25 +2,36 @@ import { BrowserRouter } from "react-router-dom";
 
 import "./shared/forms/TraducoesYup";
 
-import { AppRoutes } from "./routes";
+import { PrivateRoutes, PublicRoutes } from "./routes";
 import { MenuLateral } from "./shared/components";
 import { AppThemeProvider, AppDrawerProvider } from "./shared/contexts";
-import { Login } from "./pages";
-import { AuthProvider } from "./shared/contexts/AuthContext";
+import { AuthProvider, useAuthContext } from "./shared/contexts/AuthContext";
+
+const PrivateRoute = ({ children }: { children: React.ReactNode }) => {
+  const { isAuthenticated } = useAuthContext();
+
+  return isAuthenticated ? (
+    <>{children}</>
+  ) : (
+    <AppThemeProvider>
+      <PublicRoutes />
+    </AppThemeProvider>
+  );
+};
 
 export const App = () => {
   return (
     <AuthProvider>
       <AppThemeProvider>
-        <Login>
-          <AppDrawerProvider>
-            <BrowserRouter>
+        <AppDrawerProvider>
+          <BrowserRouter>
+            <PrivateRoute>
               <MenuLateral>
-                <AppRoutes />
+                <PrivateRoutes />
               </MenuLateral>
-            </BrowserRouter>
-          </AppDrawerProvider>
-        </Login>
+            </PrivateRoute>
+          </BrowserRouter>
+        </AppDrawerProvider>
       </AppThemeProvider>
     </AuthProvider>
   );
