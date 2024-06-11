@@ -1,6 +1,5 @@
 import React, { useEffect } from "react";
 import { Box, Collapse, Alert, IconButton, Icon } from "@mui/material";
-import CloseIcon from "@mui/icons-material/Close";
 
 export const Notificacao: React.FC<{
   mensagem: string;
