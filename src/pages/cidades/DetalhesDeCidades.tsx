@@ -48,11 +48,9 @@ export const DetalhesDeCidades = () => {
   });
 
   const onSubmit = (data: TDetalhesDeCidades) => {
-    console.log(isCadastro);
     if (isCadastro) {
       handleSave(data);
     } else {
-      console.log(data);
       handleEdit(data);
     }
   };
