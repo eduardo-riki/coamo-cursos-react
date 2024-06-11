@@ -1,4 +1,3 @@
-import { PropsWithChildren } from "react";
 import {
   Box,
   Button,
@@ -14,6 +13,8 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import { SignUpValidationSchema } from "../../shared/validations";
 import { VTextField } from "../../shared/forms/VTextField";
 import { UsuarioServices } from "../../shared/services/api";
+import { Notificacao } from "../../shared/components";
+import { useState } from "react";
 
 export type TDetalhesSignUp = {
   nome: string;
@@ -22,8 +23,12 @@ export type TDetalhesSignUp = {
   confirmarSenha: string;
 };
 
-export const SignUp: React.FC<PropsWithChildren> = ({ children }) => {
+export const SignUp: React.FC = () => {
   const navigate = useNavigate();
+
+  const [alertOpen, setAlertOpen] = useState(false);
+  const [alertMessage, setAlertMessage] = useState("");
+  const [alertType, setAlertType] = useState<"success" | "error">("success");
 
   const {
     formState: { errors },
@@ -36,11 +41,27 @@ export const SignUp: React.FC<PropsWithChildren> = ({ children }) => {
 
   const onSubmit = async (data: TDetalhesSignUp) => {
     const { confirmarSenha, ...usuarioData } = data;
+
+    if (usuarioData.senha !== confirmarSenha) {
+      return (
+        <Notificacao
+          mensagem="As senhas não conferem!"
+          tipo="error"
+          aberto={alertOpen}
+          setAberto={setAlertOpen}
+        />
+      );
+    }
+
     const result = await UsuarioServices.create(usuarioData);
     if (result instanceof Error) {
-      alert(result.message);
+      setAlertMessage("Não foi possível cadastrar!");
+      setAlertType("error");
+      setAlertOpen(true);
     } else {
-      alert("Registro cadastrado com sucesso!");
+      setAlertMessage("Cadastro efetuado com sucesso!");
+      setAlertType("success");
+      setAlertOpen(true);
       navigate("/login");
     }
   };
@@ -52,6 +73,12 @@ export const SignUp: React.FC<PropsWithChildren> = ({ children }) => {
       alignItems="center"
       height="100vh"
     >
+      <Notificacao
+        mensagem={alertMessage}
+        tipo={alertType}
+        aberto={alertOpen}
+        setAberto={setAlertOpen}
+      />
       <Card
         sx={{
           display: "flex",
