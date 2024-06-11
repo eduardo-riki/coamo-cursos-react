@@ -7,7 +7,7 @@ import { MenuLateral } from "./shared/components";
 import { AppThemeProvider, AppDrawerProvider } from "./shared/contexts";
 import { AuthProvider, useAuthContext } from "./shared/contexts/AuthContext";
 
-const PrivateRoute = ({ children }: { children: React.ReactNode }) => {
+const Private = ({ children }: { children: React.ReactNode }) => {
   const { isAuthenticated } = useAuthContext();
 
   return isAuthenticated ? (
@@ -25,11 +25,11 @@ export const App = () => {
       <AppThemeProvider>
         <AppDrawerProvider>
           <BrowserRouter>
-            <PrivateRoute>
+            <Private>
               <MenuLateral>
                 <PrivateRoutes />
               </MenuLateral>
-            </PrivateRoute>
+            </Private>
           </BrowserRouter>
         </AppDrawerProvider>
       </AppThemeProvider>
