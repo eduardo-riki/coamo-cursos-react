@@ -26,7 +26,7 @@ import { Environment } from "../../shared/environments";
 export const ListagemDeCidade: React.FC = () => {
   const [searchParams, setSearchParams] = useSearchParams();
 
-  const { debounce } = UseDebounce(300, true);
+  const { debounce } = UseDebounce();
   const navigate = useNavigate();
 
   const [cidades, setCidades] = useState<IListagemCidade[]>([]);
