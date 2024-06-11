@@ -46,7 +46,6 @@ export const DetalhesDePessoas = () => {
     if (isCadastro) {
       handleSave(data);
     } else {
-      console.log(data);
       handleEdit(data);
     }
   };
@@ -95,14 +94,14 @@ export const DetalhesDePessoas = () => {
           aoSalvar={handleSubmit(onSubmit)}
           aoSalvarEVoltar={async () => {
             await handleSubmit(onSubmit)();
-            navigate("/cidades");
+            navigate("/pessoas");
           }}
           aoApagar={() => handleDelete(Number(id))}
           aoCriarNovo={async () => {
-            await reset({ nomeCompleto: "", email: "", cidadeId: 0 });
-            navigate("/cidades/detalhe/cadastrar");
+            reset({ nomeCompleto: "", email: "", cidadeId: 0 });
+            navigate("/pessoas/detalhe/cadastrar");
           }}
-          aoVoltar={() => navigate("/cidades")}
+          aoVoltar={() => navigate("/pessoas")}
         />
       }
     >

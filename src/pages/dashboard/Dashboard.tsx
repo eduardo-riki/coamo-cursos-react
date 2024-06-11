@@ -44,7 +44,6 @@ export const Dashboard = () => {
         alert(result.message);
       } else {
         setTotalCountPessoas(result.totalCount);
-        console.log(result);
       }
     });
   }, []);
