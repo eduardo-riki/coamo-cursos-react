@@ -10,5 +10,11 @@ export const SignUpValidationSchema = Yup.object().shape({
     .test("senhas-iguais", "As senhas não coincidem", function (value) {
       return value === this.parent.confirmarSenha;
     }),
-  confirmarSenha: Yup.string().required().min(6).max(100),
+  confirmarSenha: Yup.string()
+    .required()
+    .min(6)
+    .max(100)
+    .test("senhas-iguais2", "As senhas não coincidem", function (value) {
+      return value === this.parent.senha;
+    }),
 });
