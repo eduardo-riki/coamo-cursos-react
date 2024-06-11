@@ -3,12 +3,12 @@ import { errorInterceptor, responseInterceptor } from "./interceptors";
 import { Environment } from "../../../environments";
 
 const Api = axios.create({
-  baseURL: Environment.URL_BASE,
+  baseURL: Environment.URL_BASE || "http://localhost:3333",
 });
 
 Api.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem("APP_ACCESS_TOKEN") || "http://localhost:3000";
+    const token = localStorage.getItem("APP_ACCESS_TOKEN") || "";
     if (token) {
       config.headers.Authorization = `bearer ${token}`;
     }
