@@ -1,9 +1,17 @@
-import { TextField } from "@mui/material";
+import { TextField, Typography } from "@mui/material";
 import { UseFormRegister } from "react-hook-form";
 
-import { TDetalhesDeCidades, TDetalhesDePessoas, TDetalhesDeUsuarios } from "../../pages";
+import {
+  TDetalhesDeCidades,
+  TDetalhesDePessoas,
+  TDetalhesSignIn,
+  TDetalhesSignUp,
+} from "../../pages";
 
-type TDetalhesDeCidadesEPessoas = TDetalhesDeCidades & TDetalhesDePessoas & TDetalhesDeUsuarios;
+type TDetalhes = TDetalhesDeCidades &
+  TDetalhesDePessoas &
+  TDetalhesSignIn &
+  TDetalhesSignUp;
 
 export const VTextField = ({
   name,
@@ -12,7 +20,7 @@ export const VTextField = ({
   register,
   error,
 }: {
-  name: keyof TDetalhesDeCidadesEPessoas;
+  name: keyof TDetalhes;
   label: string;
   type: string;
   register: UseFormRegister<any>;
@@ -25,7 +33,7 @@ export const VTextField = ({
       fullWidth
       required
       error={!!error}
-      helperText={error}
+      helperText={<Typography fontSize={10}>{error}</Typography>}
       type={type}
       label={label}
       {...register(name, { required: true })}
