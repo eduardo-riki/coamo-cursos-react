@@ -105,7 +105,7 @@ export const SignUp: React.FC<PropsWithChildren> = ({ children }) => {
                 label="Confirme sua senha"
                 type="password"
                 register={register}
-                error={errors.senha?.message}
+                error={errors.confirmarSenha?.message}
               />
             </Box>
           </Box>

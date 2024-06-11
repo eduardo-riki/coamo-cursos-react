@@ -69,8 +69,6 @@ export const SignIn: React.FC<PropsWithChildren> = ({ children }) => {
     return <>{children}</>;
   }
 
-  console.log("render");
-
   return (
     <Box>
       <Notificacao

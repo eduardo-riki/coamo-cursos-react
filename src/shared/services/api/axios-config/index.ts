@@ -4,10 +4,18 @@ import { Environment } from "../../../environments";
 
 const Api = axios.create({
   baseURL: Environment.URL_BASE,
-  headers: {
-    Authorization: `bearer ${localStorage.getItem("APP_ACCESS_TOKEN") || ""}`,
-  },
 });
+
+Api.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem("APP_ACCESS_TOKEN") || "http://localhost:3000";
+    if (token) {
+      config.headers.Authorization = `bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => Promise.reject(error)
+);
 
 Api.interceptors.response.use(
   (response) => responseInterceptor(response),
