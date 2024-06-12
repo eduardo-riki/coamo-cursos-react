@@ -22,12 +22,16 @@ import {
   TableRow,
 } from "@mui/material";
 import { Environment } from "../../shared/environments";
+import { useAuthContext } from "../../shared/contexts/AuthContext";
+import { useSnackbar } from "notistack";
 
 export const ListagemDeCidade: React.FC = () => {
   const [searchParams, setSearchParams] = useSearchParams();
-
-  const { debounce } = UseDebounce();
   const navigate = useNavigate();
+  const { enqueueSnackbar } = useSnackbar();
+
+  const { logout } = useAuthContext();
+  const { debounce } = UseDebounce();
 
   const [cidades, setCidades] = useState<IListagemCidade[]>([]);
   const [totalCount, setTotalCount] = useState(0);
@@ -49,9 +53,15 @@ export const ListagemDeCidade: React.FC = () => {
     if (window.confirm("Deseja realmente remover este registro?")) {
       CidadesServices.deleteById(id).then((result) => {
         if (result instanceof Error) {
-          alert(result.message);
+          enqueueSnackbar(result.message, {
+            variant: "error",
+            anchorOrigin: { vertical: "top", horizontal: "center" },
+          });
         } else {
-          alert("Registro apagado com sucesso!");
+          enqueueSnackbar("Registro apagado com sucesso!", {
+            variant: "error",
+            anchorOrigin: { vertical: "top", horizontal: "center" },
+          });
           setCidades((oldCidade) => [
             ...oldCidade.filter((oldCidade) => oldCidade.id !== id),
           ]);
@@ -67,14 +77,18 @@ export const ListagemDeCidade: React.FC = () => {
       CidadesServices.getAll(pagina, pesquisa).then((result) => {
         setIsLoading(false);
         if (result instanceof Error) {
-          alert(result.message);
+          enqueueSnackbar(result.message, {
+            variant: "error",
+            anchorOrigin: { vertical: "top", horizontal: "center" },
+          });
+          logout();
         } else {
           setCidades(result.data);
           setTotalCount(Number(result.totalCount));
         }
       });
     });
-  }, [debounce, pagina, pesquisa]);
+  }, [debounce, pagina, pesquisa, logout, enqueueSnackbar]);
 
   return (
     <LayoutBaseDePagina

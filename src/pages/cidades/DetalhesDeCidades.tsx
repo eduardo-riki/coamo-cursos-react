@@ -14,6 +14,7 @@ import { LayoutBaseDePagina } from "../../shared/layouts";
 import { FerramentasDeDetalhe } from "../../shared/components";
 import { VTextField } from "../../shared/forms/VTextField";
 import { CidadeValidationSchema } from "../../shared/validations";
+import { enqueueSnackbar } from "notistack";
 
 export type TDetalhesDeCidades = {
   nome: string;
@@ -36,7 +37,10 @@ export const DetalhesDeCidades = () => {
       if (!isCadastro) {
         const result = await CidadesServices.getById(Number(id));
         if (result instanceof Error) {
-          alert(result.message);
+          enqueueSnackbar(result.message, {
+            variant: "error",
+            anchorOrigin: { vertical: "top", horizontal: "center" },
+          });
           return { nome: "", estado: "" };
         }
         return result;
@@ -58,9 +62,15 @@ export const DetalhesDeCidades = () => {
   const handleSave = async (data: TDetalhesDeCidades) => {
     const result = await CidadesServices.create(data);
     if (result instanceof Error) {
-      alert(result.message);
+      enqueueSnackbar(result.message, {
+        variant: "error",
+        anchorOrigin: { vertical: "top", horizontal: "center" },
+      });
     } else {
-      alert("Registro cadastrado com sucesso!");
+      enqueueSnackbar("Registro cadastrado com sucesso!", {
+        variant: "success",
+        anchorOrigin: { vertical: "top", horizontal: "center" },
+      });
     }
   };
 
@@ -70,9 +80,15 @@ export const DetalhesDeCidades = () => {
       ...data,
     });
     if (result instanceof Error) {
-      alert(result.message);
+      enqueueSnackbar(result.message, {
+        variant: "error",
+        anchorOrigin: { vertical: "top", horizontal: "center" },
+      });
     } else {
-      alert("Registro atualizado com sucesso!");
+      enqueueSnackbar("Registro atualizado com sucesso!", {
+        variant: "success",
+        anchorOrigin: { vertical: "top", horizontal: "center" },
+      });
     }
   };
 
@@ -80,9 +96,15 @@ export const DetalhesDeCidades = () => {
     if (window.confirm("Deseja realmente remover este registro?")) {
       CidadesServices.deleteById(id).then((result) => {
         if (result instanceof Error) {
-          alert(result.message);
+          enqueueSnackbar(result.message, {
+            variant: "error",
+            anchorOrigin: { vertical: "top", horizontal: "center" },
+          });
         } else {
-          alert("Registro apagado com sucesso!");
+          enqueueSnackbar("Registro apagado com sucesso!", {
+            variant: "success",
+            anchorOrigin: { vertical: "top", horizontal: "center" },
+          });
           navigate("/cidades");
         }
       });
