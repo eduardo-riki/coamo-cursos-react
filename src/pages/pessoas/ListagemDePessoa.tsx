@@ -22,6 +22,7 @@ import {
   TableRow,
 } from "@mui/material";
 import { Environment } from "../../shared/environments";
+import { enqueueSnackbar } from "notistack";
 
 export const ListagemDePessoa: React.FC = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -49,9 +50,15 @@ export const ListagemDePessoa: React.FC = () => {
     if (window.confirm("Deseja realmente remover este registro?")) {
       PessoasServices.deleteById(id).then((result) => {
         if (result instanceof Error) {
-          alert(result.message);
+          enqueueSnackbar(result.message, {
+            variant: "error",
+            anchorOrigin: { vertical: "top", horizontal: "center" },
+          });
         } else {
-          alert("Registro apagado com sucesso!");
+          enqueueSnackbar("Registro apagado com sucesso!", {
+            variant: "error",
+            anchorOrigin: { vertical: "top", horizontal: "center" },
+          });
           setPessoas((oldPessoa) => [
             ...oldPessoa.filter((oldPessoa) => oldPessoa.id !== id),
           ]);
@@ -67,7 +74,10 @@ export const ListagemDePessoa: React.FC = () => {
       PessoasServices.getAll(pagina, pesquisa).then((result) => {
         setIsLoading(false);
         if (result instanceof Error) {
-          alert(result.message);
+          enqueueSnackbar(result.message, {
+            variant: "error",
+            anchorOrigin: { vertical: "top", horizontal: "center" },
+          });
         } else {
           setPessoas(result.data);
           setTotalCount(Number(result.totalCount));
