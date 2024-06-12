@@ -8,6 +8,7 @@ import {
   useState,
 } from "react";
 import { AuthService } from "../services/api/auth/AuthService";
+import { jwtDecode } from "jwt-decode";
 
 interface IAuthContextData {
   isAuthenticated: boolean;
@@ -19,15 +20,6 @@ const AuthContext = createContext({} as IAuthContextData);
 
 export const AuthProvider: React.FC<PropsWithChildren> = ({ children }) => {
   const [accessToken, setAccessToken] = useState<string>();
-
-  useEffect(() => {
-    const accessToken = localStorage.getItem("APP_ACCESS_TOKEN");
-    if (accessToken) {
-      setAccessToken(accessToken);
-    } else {
-      setAccessToken(undefined);
-    }
-  }, []);
 
   const handleLogin = useCallback(async (email: string, senha: string) => {
     const result = await AuthService.auth(email, senha);
@@ -45,6 +37,27 @@ export const AuthProvider: React.FC<PropsWithChildren> = ({ children }) => {
   }, []);
 
   const isAuthenticated = useMemo(() => !!accessToken, [accessToken]);
+
+  useEffect(() => {
+    const accessToken = localStorage.getItem("APP_ACCESS_TOKEN") || undefined;
+
+    if (accessToken) {
+      const decoded = jwtDecode(accessToken);
+
+      if (!!decoded.exp) {
+        const currentTime = Date.now();
+        const expTime = decoded.exp * 1000;
+
+        if (expTime < currentTime) {
+          handleLogOut();
+          return;
+        }
+        setAccessToken(accessToken);
+      }
+    } else {
+      setAccessToken(undefined);
+    }
+  }, [handleLogOut, setAccessToken]);
 
   return (
     <AuthContext.Provider

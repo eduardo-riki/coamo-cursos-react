@@ -15,6 +15,7 @@ import { PessoasServices } from "../../shared/services/api/pessoas/PessoasServic
 import { FerramentasDaListagem } from "../../shared/components";
 import { LayoutBaseDePagina } from "../../shared/layouts";
 import { useNavigate } from "react-router-dom";
+import { enqueueSnackbar } from "notistack";
 
 export const Dashboard = () => {
   const [isLoadingCidades, setIsLoadingCidades] = useState(true);
@@ -32,7 +33,10 @@ export const Dashboard = () => {
       setIsLoadingCidades(false);
 
       if (result instanceof Error) {
-        alert(result.message);
+        enqueueSnackbar(result.message, {
+          variant: "error",
+          anchorOrigin: { vertical: "top", horizontal: "center" },
+        });
       } else {
         setTotalCountCidades(result.totalCount);
       }
@@ -41,7 +45,10 @@ export const Dashboard = () => {
       setIsLoadingPessoas(false);
 
       if (result instanceof Error) {
-        alert(result.message);
+        enqueueSnackbar(result.message, {
+          variant: "error",
+          anchorOrigin: { vertical: "top", horizontal: "center" },
+        });
       } else {
         setTotalCountPessoas(result.totalCount);
       }

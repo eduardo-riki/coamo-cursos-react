@@ -8,6 +8,7 @@ import { LayoutBaseDePagina } from "../../shared/layouts";
 import { FerramentasDeDetalhe } from "../../shared/components";
 import { VTextField } from "../../shared/forms/VTextField";
 import { PessoaValidationSchema } from "../../shared/validations";
+import { enqueueSnackbar } from "notistack";
 
 export type TDetalhesDePessoas = {
   nomeCompleto: string;
@@ -31,7 +32,10 @@ export const DetalhesDePessoas = () => {
       if (!isCadastro) {
         const result = await PessoasServices.getById(Number(id));
         if (result instanceof Error) {
-          alert(result.message);
+          enqueueSnackbar(result.message, {
+            variant: "error",
+            anchorOrigin: { vertical: "top", horizontal: "center" },
+          });
           return { nomeCompleto: "", email: "", cidadeId: 0 };
         }
         return result;
@@ -53,9 +57,15 @@ export const DetalhesDePessoas = () => {
   const handleSave = async (data: TDetalhesDePessoas) => {
     const result = await PessoasServices.create(data);
     if (result instanceof Error) {
-      alert(result.message);
+      enqueueSnackbar(result.message, {
+        variant: "error",
+        anchorOrigin: { vertical: "top", horizontal: "center" },
+      });
     } else {
-      alert("Registro cadastrado com sucesso!");
+      enqueueSnackbar("Registro cadastrado com sucesso!", {
+        variant: "error",
+        anchorOrigin: { vertical: "top", horizontal: "center" },
+      });
     }
   };
 
@@ -65,9 +75,15 @@ export const DetalhesDePessoas = () => {
       ...data,
     });
     if (result instanceof Error) {
-      alert(result.message);
+      enqueueSnackbar(result.message, {
+        variant: "error",
+        anchorOrigin: { vertical: "top", horizontal: "center" },
+      });
     } else {
-      alert("Registro atualizado com sucesso!");
+      enqueueSnackbar("Registro atualizado com sucesso!", {
+        variant: "error",
+        anchorOrigin: { vertical: "top", horizontal: "center" },
+      });
     }
   };
 
@@ -75,9 +91,15 @@ export const DetalhesDePessoas = () => {
     if (window.confirm("Deseja realmente remover este registro?")) {
       PessoasServices.deleteById(id).then((result) => {
         if (result instanceof Error) {
-          alert(result.message);
+          enqueueSnackbar(result.message, {
+            variant: "error",
+            anchorOrigin: { vertical: "top", horizontal: "center" },
+          });
         } else {
-          alert("Registro apagado com sucesso!");
+          enqueueSnackbar("Registro apagado com sucesso!", {
+            variant: "error",
+            anchorOrigin: { vertical: "top", horizontal: "center" },
+          });
           navigate("/pessoas");
         }
       });

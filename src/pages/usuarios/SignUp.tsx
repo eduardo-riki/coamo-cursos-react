@@ -13,8 +13,7 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import { SignUpValidationSchema } from "../../shared/validations";
 import { VTextField } from "../../shared/forms/VTextField";
 import { UsuarioServices } from "../../shared/services/api";
-import { Notificacao } from "../../shared/components";
-import { useState } from "react";
+import { enqueueSnackbar } from "notistack";
 
 export type TDetalhesSignUp = {
   nome: string;
@@ -25,10 +24,6 @@ export type TDetalhesSignUp = {
 
 export const SignUp: React.FC = () => {
   const navigate = useNavigate();
-
-  const [alertOpen, setAlertOpen] = useState(false);
-  const [alertMessage, setAlertMessage] = useState("");
-  const [alertType, setAlertType] = useState<"success" | "error">("success");
 
   const {
     formState: { errors },
@@ -43,124 +38,119 @@ export const SignUp: React.FC = () => {
     const { confirmarSenha, ...usuarioData } = data;
 
     if (usuarioData.senha !== confirmarSenha) {
-      setAlertMessage("As senhas não conferem!");
-      setAlertType("error");
-      setAlertOpen(true);
+      enqueueSnackbar("As senhas não conferem!", {
+        variant: "error",
+        anchorOrigin: { vertical: "top", horizontal: "center" },
+      });
       return;
     }
 
     const result = await UsuarioServices.create(usuarioData);
     if (result instanceof Error) {
-      setAlertMessage("Não foi possível cadastrar!");
-      setAlertType("error");
-      setAlertOpen(true);
+      enqueueSnackbar(result.message, {
+        variant: "error",
+        anchorOrigin: { vertical: "top", horizontal: "center" },
+      });
     } else {
-      setAlertMessage("Cadastro efetuado com sucesso!");
-      setAlertType("success");
-      setAlertOpen(true);
+      enqueueSnackbar("Cadastro efetuado com sucesso!", {
+        variant: "success",
+        anchorOrigin: { vertical: "top", horizontal: "center" },
+      });
       navigate("/login");
     }
   };
 
   return (
-    <Box>
-      <Notificacao
-        mensagem={alertMessage}
-        tipo={alertType}
-        aberto={alertOpen}
-        setAberto={setAlertOpen}
-      />
-      <Box
-        display="flex"
-        justifyContent="center"
-        alignItems="center"
-        height="100vh"
+    <Box
+      display="flex"
+      justifyContent="center"
+      alignItems="center"
+      height="100vh"
+    >
+      <Card
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "center",
+          padding: 1,
+          minHeight: 300,
+          width: 275,
+        }}
       >
-        <Card
-          sx={{
-            display: "flex",
-            flexDirection: "column",
-            justifyContent: "center",
-            padding: 1,
-            minHeight: 300,
-            width: 275,
-          }}
-        >
-          <CardContent>
+        <CardContent>
+          <Box
+            display="flex"
+            flexDirection="column"
+            alignItems="center"
+            gap={2}
+          >
+            <Typography variant="h5" fontWeight={500}>
+              Cadastrar
+            </Typography>
             <Box
               display="flex"
               flexDirection="column"
               alignItems="center"
-              gap={2}
-            >
-              <Typography variant="h5" fontWeight={500}>
-                Cadastrar
-              </Typography>
-              <Box
-                display="flex"
-                flexDirection="column"
-                alignItems="center"
-                width="100%"
-                gap={1}
-              >
-                <VTextField
-                  name="nome"
-                  label="Nome Completo"
-                  type="text"
-                  register={register}
-                  error={errors.nome?.message}
-                />
-                <VTextField
-                  name="email"
-                  label="E-mail"
-                  type="email"
-                  register={register}
-                  error={errors.email?.message}
-                />
-                <VTextField
-                  name="senha"
-                  label="Senha"
-                  type="password"
-                  register={register}
-                  error={errors.senha?.message}
-                />
-                <VTextField
-                  name="confirmarSenha"
-                  label="Confirme sua senha"
-                  type="password"
-                  register={register}
-                  error={errors.confirmarSenha?.message}
-                />
-              </Box>
-            </Box>
-          </CardContent>
-          <CardActions>
-            <Box
               width="100%"
-              display="flex"
-              flexDirection="column"
-              alignItems="center"
-              justifyContent="space-between"
-              gap={2}
+              gap={1}
             >
-              <Button
-                variant="contained"
-                onClick={handleSubmit(onSubmit)}
-                sx={{ width: "90%" }}
-              >
-                Entrar
-              </Button>
-              <Button
-                variant="text"
-                size="small"
-                onClick={() => navigate("/login")}
-              >
-                Já possui conta?
-              </Button>
+              <VTextField
+                name="nome"
+                label="Nome Completo"
+                type="text"
+                register={register}
+                error={errors.nome?.message}
+              />
+              <VTextField
+                name="email"
+                label="E-mail"
+                type="email"
+                register={register}
+                error={errors.email?.message}
+              />
+              <VTextField
+                name="senha"
+                label="Senha"
+                type="password"
+                register={register}
+                error={errors.senha?.message}
+              />
+              <VTextField
+                name="confirmarSenha"
+                label="Confirme sua senha"
+                type="password"
+                register={register}
+                error={errors.confirmarSenha?.message}
+              />
             </Box>
-          </CardActions>
-        </Card>
-      </Box>
+          </Box>
+        </CardContent>
+        <CardActions>
+          <Box
+            width="100%"
+            display="flex"
+            flexDirection="column"
+            alignItems="center"
+            justifyContent="space-between"
+            gap={2}
+          >
+            <Button
+              variant="contained"
+              onClick={handleSubmit(onSubmit)}
+              sx={{ width: "90%" }}
+            >
+              Entrar
+            </Button>
+            <Button
+              variant="text"
+              size="small"
+              onClick={() => navigate("/login")}
+            >
+              Já possui conta?
+            </Button>
+          </Box>
+        </CardActions>
+      </Card>
     </Box>
   );
 };
