@@ -20,10 +20,9 @@ import {
   TableFooter,
   TableHead,
   TableRow,
-} from "@mui/material";
+} from "@mui/material"; 
 import { Environment } from "../../shared/environments";
 import { enqueueSnackbar } from "notistack";
-import { CidadesServices } from "../../shared/services/api";
 
 export const ListagemDePessoa: React.FC = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -34,7 +33,6 @@ export const ListagemDePessoa: React.FC = () => {
   const [pessoas, setPessoas] = useState<IListagemPessoa[]>([]);
   const [totalCount, setTotalCount] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
-  const [cidades, setCidades] = useState<{ [key: number]: string }>({});
 
   const pesquisa = useMemo(() => {
     return searchParams.get("pesquisa") || "";
@@ -83,22 +81,6 @@ export const ListagemDePessoa: React.FC = () => {
         } else {
           setPessoas(result.data);
           setTotalCount(Number(result.totalCount));
-
-          const cidadeIds = result.data.map(pessoa => pessoa.cidadeId);
-          const uniqueCidadeIds = Array.from(new Set(cidadeIds));
-
-          Promise.all(
-            uniqueCidadeIds.map(id => CidadesServices.getById(id))
-          ).then(cidadeResults => {
-            const cidadesMap = cidadeResults.reduce((acc, cidade, index) => {
-              if (!(cidade instanceof Error)) {
-                acc[uniqueCidadeIds[index]] = cidade.nome;
-              }
-              return acc;
-            }, {} as { [key: number]: string });
-
-            setCidades(cidadesMap);
-          });
         }
       });
     });
@@ -154,7 +136,7 @@ export const ListagemDePessoa: React.FC = () => {
                 </TableCell>
                 <TableCell width="30%">{pessoa.nomeCompleto}</TableCell>
                 <TableCell width="30%">{pessoa.email}</TableCell>
-                <TableCell width="30%">{cidades[pessoa.cidadeId] || pessoa.cidadeId}</TableCell>
+                <TableCell width="30%">{pessoa.cidadeNome}</TableCell>
               </TableRow>
             ))}
           </TableBody>

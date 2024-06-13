@@ -1,11 +1,13 @@
 import { Environment } from "../../../environments";
 import { Api } from "../axios-config";
+import { CidadesServices } from "../cidades/CidadesServices";
 
 export interface IListagemPessoa {
   id: number;
   nomeCompleto: string;
   email: string;
   cidadeId: number;
+  cidadeNome: string;
 }
 
 export interface IDetalhePessoa {
@@ -42,12 +44,25 @@ const getAll = async (
   filter = ""
 ): Promise<TPessoasComTotalCount | Error> => {
   try {
-    const url = `/pessoa/listar?page=${page}&limit=${Environment.LIMITE_DE_LINHAS}&filter=${filter}`;
-    const { data, headers } = await Api.get(url);
+    const urlPessoa = `/pessoa/listar?page=${page}&limit=${Environment.LIMITE_DE_LINHAS}&filter=${filter}`;
+    const { data, headers } = await Api.get(urlPessoa);
 
     if (data) {
+      const pessoasComCidade = await Promise.all(
+        data.map(async (pessoa: IListagemPessoa) => {
+          const cidadeResult = await CidadesServices.getById(pessoa.cidadeId);
+          if (cidadeResult instanceof Error) {
+            throw cidadeResult;
+          }
+          return {
+            ...pessoa,
+            cidadeNome: cidadeResult.nome,
+          };
+        })
+      );
+
       return {
-        data,
+        data: pessoasComCidade,
         totalCount: headers["x-total-count"] || process.env.LIMITE_DE_LINHAS,
       };
     }
