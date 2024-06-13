@@ -32,13 +32,13 @@ export const AuthProvider: React.FC<PropsWithChildren> = ({ children }) => {
       setAccessToken(result.accessToken);
       navigate("/pagina-inicial");
     }
-  }, []);
+  }, [navigate]);
 
   const handleLogOut = useCallback(() => {
     localStorage.removeItem("APP_ACCESS_TOKEN");
     setAccessToken(undefined);
     navigate("/login");
-  }, []);
+  }, [navigate]);
 
   const isAuthenticated = useMemo(() => !!accessToken, [accessToken]);
 

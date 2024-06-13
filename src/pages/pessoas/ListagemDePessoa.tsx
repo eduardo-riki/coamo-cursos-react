@@ -23,6 +23,7 @@ import {
 } from "@mui/material";
 import { Environment } from "../../shared/environments";
 import { enqueueSnackbar } from "notistack";
+import { CidadesServices } from "../../shared/services/api";
 
 export const ListagemDePessoa: React.FC = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -33,6 +34,7 @@ export const ListagemDePessoa: React.FC = () => {
   const [pessoas, setPessoas] = useState<IListagemPessoa[]>([]);
   const [totalCount, setTotalCount] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
+  const [cidades, setCidades] = useState<{ [key: number]: string }>({});
 
   const pesquisa = useMemo(() => {
     return searchParams.get("pesquisa") || "";
@@ -81,6 +83,22 @@ export const ListagemDePessoa: React.FC = () => {
         } else {
           setPessoas(result.data);
           setTotalCount(Number(result.totalCount));
+
+          const cidadeIds = result.data.map(pessoa => pessoa.cidadeId);
+          const uniqueCidadeIds = Array.from(new Set(cidadeIds));
+
+          Promise.all(
+            uniqueCidadeIds.map(id => CidadesServices.getById(id))
+          ).then(cidadeResults => {
+            const cidadesMap = cidadeResults.reduce((acc, cidade, index) => {
+              if (!(cidade instanceof Error)) {
+                acc[uniqueCidadeIds[index]] = cidade.nome;
+              }
+              return acc;
+            }, {} as { [key: number]: string });
+
+            setCidades(cidadesMap);
+          });
         }
       });
     });
@@ -109,15 +127,16 @@ export const ListagemDePessoa: React.FC = () => {
         <Table>
           <TableHead>
             <TableRow>
-              <TableCell>Ações</TableCell>
-              <TableCell>Nome Completo</TableCell>
-              <TableCell>E-mail</TableCell>
+              <TableCell width="10%">Ações</TableCell>
+              <TableCell width="30%">Nome Completo</TableCell>
+              <TableCell width="30%">E-mail</TableCell>
+              <TableCell width="30%">Cidade</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
             {pessoas.map((pessoa) => (
               <TableRow key={pessoa.id}>
-                <TableCell>
+                <TableCell width="10%">
                   <IconButton
                     size="small"
                     onClick={() => handleEdit(pessoa.id)}
@@ -133,8 +152,9 @@ export const ListagemDePessoa: React.FC = () => {
                     <Icon fontSize="small">delete</Icon>
                   </IconButton>
                 </TableCell>
-                <TableCell>{pessoa.nomeCompleto}</TableCell>
-                <TableCell>{pessoa.email}</TableCell>
+                <TableCell width="30%">{pessoa.nomeCompleto}</TableCell>
+                <TableCell width="30%">{pessoa.email}</TableCell>
+                <TableCell width="30%">{cidades[pessoa.cidadeId] || pessoa.cidadeId}</TableCell>
               </TableRow>
             ))}
           </TableBody>
@@ -142,7 +162,7 @@ export const ListagemDePessoa: React.FC = () => {
           <TableFooter>
             {totalCount > 0 && totalCount > Environment.LIMITE_DE_LINHAS ? (
               <TableRow>
-                <TableCell colSpan={3} sx={{ justifyContent: "center" }}>
+                <TableCell colSpan={4} sx={{ justifyContent: "center" }}>
                   <Pagination
                     shape="rounded"
                     page={pagina}
@@ -160,13 +180,13 @@ export const ListagemDePessoa: React.FC = () => {
 
             {isLoading ? (
               <TableRow>
-                <TableCell colSpan={3}>
+                <TableCell colSpan={4}>
                   <LinearProgress variant="indeterminate" />
                 </TableCell>
               </TableRow>
             ) : totalCount === 0 ? (
               <TableRow>
-                <TableCell colSpan={3}>Nenhum registro encontrado.</TableCell>
+                <TableCell colSpan={4}>Nenhum registro encontrado.</TableCell>
               </TableRow>
             ) : null}
           </TableFooter>
