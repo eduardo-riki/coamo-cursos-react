@@ -9,6 +9,7 @@ import {
 } from "react";
 import { AuthService } from "../services/api/auth/AuthService";
 import { jwtDecode } from "jwt-decode";
+import { useNavigate } from "react-router-dom";
 
 interface IAuthContextData {
   isAuthenticated: boolean;
@@ -19,6 +20,7 @@ interface IAuthContextData {
 const AuthContext = createContext({} as IAuthContextData);
 
 export const AuthProvider: React.FC<PropsWithChildren> = ({ children }) => {
+  const navigate = useNavigate();
   const [accessToken, setAccessToken] = useState<string>();
 
   const handleLogin = useCallback(async (email: string, senha: string) => {
@@ -28,12 +30,14 @@ export const AuthProvider: React.FC<PropsWithChildren> = ({ children }) => {
     } else {
       localStorage.setItem("APP_ACCESS_TOKEN", result.accessToken);
       setAccessToken(result.accessToken);
+      navigate("/pagina-inicial");
     }
   }, []);
 
   const handleLogOut = useCallback(() => {
     localStorage.removeItem("APP_ACCESS_TOKEN");
     setAccessToken(undefined);
+    navigate("/login");
   }, []);
 
   const isAuthenticated = useMemo(() => !!accessToken, [accessToken]);
@@ -55,7 +59,7 @@ export const AuthProvider: React.FC<PropsWithChildren> = ({ children }) => {
         setAccessToken(accessToken);
       }
     } else {
-      setAccessToken(undefined);
+      handleLogOut();
     }
   }, [handleLogOut, setAccessToken]);
 

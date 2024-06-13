@@ -22,7 +22,7 @@ export type TDetalhesSignIn = {
 };
 
 export const SignIn: React.FC<PropsWithChildren> = ({ children }) => {
-  const { isAuthenticated, login } = useAuthContext();
+  const { login } = useAuthContext();
   const navigate = useNavigate();
 
   const {
@@ -62,10 +62,6 @@ export const SignIn: React.FC<PropsWithChildren> = ({ children }) => {
         });
       });
   };
-
-  if (isAuthenticated) {
-    return <>{children}</>;
-  }
 
   return (
     <Box
