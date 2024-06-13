@@ -9,6 +9,7 @@ import { FerramentasDeDetalhe } from "../../shared/components";
 import { VTextField } from "../../shared/forms/VTextField";
 import { PessoaValidationSchema } from "../../shared/validations";
 import { enqueueSnackbar } from "notistack";
+import { AutoCompleteCidade } from "./components/AutoCompleteCidades";
 
 export type TDetalhesDePessoas = {
   nomeCompleto: string;
@@ -23,6 +24,7 @@ export const DetalhesDePessoas = () => {
   const navigate = useNavigate();
 
   const {
+    control,
     formState: { errors, isLoading },
     handleSubmit,
     register,
@@ -63,7 +65,7 @@ export const DetalhesDePessoas = () => {
       });
     } else {
       enqueueSnackbar("Registro cadastrado com sucesso!", {
-        variant: "error",
+        variant: "success",
         anchorOrigin: { vertical: "top", horizontal: "center" },
       });
     }
@@ -81,7 +83,7 @@ export const DetalhesDePessoas = () => {
       });
     } else {
       enqueueSnackbar("Registro atualizado com sucesso!", {
-        variant: "error",
+        variant: "success",
         anchorOrigin: { vertical: "top", horizontal: "center" },
       });
     }
@@ -97,7 +99,7 @@ export const DetalhesDePessoas = () => {
           });
         } else {
           enqueueSnackbar("Registro apagado com sucesso!", {
-            variant: "error",
+            variant: "success",
             anchorOrigin: { vertical: "top", horizontal: "center" },
           });
           navigate("/pessoas");
@@ -134,7 +136,7 @@ export const DetalhesDePessoas = () => {
           <Grid container direction="column" padding={2} spacing={2}>
             <Grid item>
               <Typography variant="h6">
-                {isCadastro ? "Cadastrar nova cidade" : "Editar cidade"}
+                {isCadastro ? "Cadastrar nova pessoa" : "Editar pessoa"}
               </Typography>
             </Grid>
             <Grid container item direction="row" spacing={2}>
@@ -161,11 +163,8 @@ export const DetalhesDePessoas = () => {
             </Grid>
             <Grid container item direction="row" spacing={2}>
               <Grid item xs={12} sm={12} md={6} lg={4} xl={2}>
-                <VTextField
-                  name="cidadeId"
-                  label="Cidade"
-                  type="text"
-                  register={register}
+                <AutoCompleteCidade
+                  control={control}
                   error={errors.cidadeId?.message}
                 />
               </Grid>
