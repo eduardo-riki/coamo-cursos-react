@@ -1,6 +1,6 @@
 import { Environment } from "../../../environments";
 import { Api } from "../axios-config";
-import { CidadesServices } from "../cidades/CidadesServices";
+import { CidadesServices, IDetalheCidade } from "../cidades/CidadesServices";
 
 export interface IListagemPessoa {
   id: number;
@@ -15,6 +15,7 @@ export interface IDetalhePessoa {
   nomeCompleto: string;
   email: string;
   cidadeId: number;
+  cidadeNome?: string
 }
 
 export interface TPessoasComTotalCount {
@@ -74,11 +75,31 @@ const getAll = async (
   }
 };
 
-const getById = async (id: number): Promise<IDetalhePessoa | Error> => {
+const getById = async (
+  id: number
+): Promise<IDetalhePessoa | Error> => {
   try {
-    const { data } = await Api.get(`/pessoa/${id}`);
-    if (data) {
-      return data;
+    const pessoasData = await Api.get(`/pessoa/${id}`);
+    const pessoa: IDetalhePessoa = pessoasData.data;
+    if (pessoa) {
+      try {
+        const cidadeData = await Api.get(`cidade/${pessoa.cidadeId}`);
+        const cidade: IDetalheCidade = cidadeData.data;
+
+        if (cidade) {
+          return {
+            ...pessoa,
+            cidadeNome: cidade.nome,
+          };
+        } else {
+          return new Error("Erro ao listar a cidade.");
+        }
+      } catch (cidadeError) {
+        return new Error(
+          (cidadeError as { message: string }).message ||
+            "Erro ao listar a cidade."
+        );
+      }
     }
 
     return new Error("Erro ao listar o registro.");
